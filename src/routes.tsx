@@ -6,6 +6,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Error } from "./pages/Error";
 import { Home } from "./pages/Home";
 import { NotFound } from "./pages/NotFound";
+import { Step } from "./pages/Step";
 
 
 
@@ -28,8 +29,16 @@ export const routes = createBrowserRouter([
     element: <ProtectedRoute element={<Dashboard />} />
   },
   {
+    path: '/step/:order',
+    element: <ProtectedRoute element={<Step />} />
+  },
+  {
     path: '*',
     element: <NotFound />
   },
+  {
+    path: '/errors',
+    element: <Error />
+  }
 
 ])

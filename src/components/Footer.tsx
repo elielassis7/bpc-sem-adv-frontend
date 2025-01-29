@@ -2,7 +2,7 @@ import BpcLogo from '../assets/bpc-logo.png'
 
 export function Footer() {
   return (
-    <footer className="bg-emerald-400 p-4 text-white bottom-0">
+    <footer className="bg-emerald-400 p-4 text-yellow-900 font-semibold bottom-0">
       <div className="grid grid-cols-3 gap-4">
         <div>
           <h2 className="text-lg mb-2">

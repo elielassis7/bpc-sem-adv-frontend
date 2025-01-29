@@ -10,20 +10,28 @@ export function AxiosInterceptor() {
   useEffect(() => {
     const interceptorId = api.interceptors.response.use(
       (response) => response,
-      (error) => {
+      async (error) => {
         if (isAxiosError(error)) {
           const status = error.response?.status;
-          const code = error.response?.data.code;
 
-          if (status === 401 && code === 'UNAUTHORIZED') {
+          // Verificação direta de status 401
+          if (status === 401) {
             localStorage.removeItem('token');
-            toast.error('Necessário fazer o login antes.')
+
+            // Verifica se o erro é por token expirado ou não autorizado
+            const errorMessage = error.response?.data?.message;
+            if (errorMessage === 'Token expired') {
+              toast.error('Sessão expirada. Faça login novamente.');
+            } else {
+              toast.error('Necessário fazer o login antes.');
+            }
             navigate('/sign-in', { replace: true });
           } else {
-            throw error;
+            console.error("Unhandled error:", error); // Adiciona o log detalhado de outros erros
           }
         }
-      },
+        return Promise.reject(error); // Corrige o problema de promise não resolvida
+      }
     );
 
     return () => {
