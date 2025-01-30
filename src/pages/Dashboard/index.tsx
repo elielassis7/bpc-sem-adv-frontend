@@ -50,8 +50,14 @@ export function Dashboard() {
         ) : (
           <>
             {data.map((step: StepAllProps) => (
-              <div onClick={() => navigate(`/step/${step.order}`)} key={step.id} className="flex flex-col mx-4 h-36 w-72 text-black text-3xl font-bold bg-orange-400 rounded-lg shadow-md">
-                <h2>{step.title}</h2>
+              <div
+                onClick={() => navigate(`/step/${step.order}`)}
+                key={step.id}
+                className="flex flex-col mx-4 h-44 w-72  bg-orange-400 rounded-lg shadow-md relative"
+              >
+                <img src={step.pathImage} alt="Logo do cadastro Único" className="object-cover absolute top-0" />
+                <h2 className="absolute top-0 w-full text-black text-lg font-bold bg-yellow-500/30 text-center">{step.title}</h2>
+                <p className="absolute bottom-0 bg-yellow-300 text-center">{step.description}</p>
               </div>
             ))}
           </>

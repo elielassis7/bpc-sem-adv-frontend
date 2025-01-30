@@ -10,7 +10,6 @@ export interface StepAllProps {
 
 export const stepAll = async (): Promise<any> => {
   const response = await api.get<StepAllProps>(`/step/all`);
-  console.log(response.data);
 
   return response.data;
 };
