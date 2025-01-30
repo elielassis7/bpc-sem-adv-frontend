@@ -14,7 +14,6 @@ export interface StepProp {
 }
 
 export const step = async (order: number): Promise<any> => {
-  console.log(`get-step: ${order}`)
   const response = await api.get<StepProp>(`/step/${order}`);
   return response.data;
 };
