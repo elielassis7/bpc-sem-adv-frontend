@@ -12,8 +12,13 @@ interface CustomError {
   code: string
 }
 
+interface ListProps {
+  watching: number
 
-export function ListClass({ watching }: { watching: number }) {
+}
+
+
+export function ListClass(props: ListProps) {
 
 
   const navigate = useNavigate()
@@ -35,6 +40,7 @@ export function ListClass({ watching }: { watching: number }) {
   function isCustomError(error: any): error is CustomError {
     return error && typeof error.message === 'string';
   }
+
 
 
   return (
@@ -71,7 +77,7 @@ export function ListClass({ watching }: { watching: number }) {
 
                 <img src={step.pathImage} alt="Logo do cadastro Único" className="object-cover absolute top-0" />
                 <h2 className="absolute bottom-0 w-full text-black text-sm font-bold bg-yellow-500/30 text-center object-cover">{step.title}</h2>
-                {watching === step.order ?
+                {props.watching === step.order ?
                   <div className="absolute w-full h-full bg-gray-700/50 flex items-center justify-center">
                     <h2 className=" text-white text-lg font-semibold text-center">Assistindo</h2>
                   </div>

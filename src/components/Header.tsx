@@ -8,7 +8,7 @@ export function Header() {
 
 
   return (
-    <header className="bg-emerald-400 p-4 flex justify-between items-center shadow-md">
+    <header className="bg-emerald-400 p-4 flex justify-between items-center shadow-lg">
       <div className="flex items-center">
         <img src={BpcLogo} alt="Logo" className="h-16 mr-2" />
         <Link to={"/"} className="text-white text-xl font-semibold">Pagina Principal</Link>

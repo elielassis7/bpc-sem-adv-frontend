@@ -22,6 +22,12 @@ export function Dashboard() {
 
   const { data, isLoading, error } = useStepAll();
 
+  let stepLength: number = 0
+  if (!isLoading) {
+    stepLength = data.length
+  }
+
+
   useEffect(() => {
     if (error) {
       if (isCustomError(error)) {
@@ -32,10 +38,16 @@ export function Dashboard() {
       }
       navigate('/errors');
     }
+
+
   }, [error, navigate]);
 
   function isCustomError(error: any): error is CustomError {
     return error && typeof error.message === 'string';
+  }
+
+  if (!data && isLoading) {
+    return <Loading />
   }
 
   return (
@@ -47,11 +59,12 @@ export function Dashboard() {
           <Loading />
         ) : (
           <>
+
             {data
               .sort((a: StepAllProps, b: StepAllProps) => a.order - b.order)
               .map((step: StepAllProps) => (
                 <div
-                  onClick={() => navigate(`/step/${step.order}`)}
+                  onClick={() => navigate(`/step/${step.order}`, { state: { stepLength } })}
                   key={step.id}
                   tabIndex={10 + step.order}
                   className="col-span-1 flex flex-col mx-4 h-44 w-72 bg-orange-400 rounded-lg shadow-md relative overflow-hidden focus:outline-none focus:border-4 focus:border-yellow-400"

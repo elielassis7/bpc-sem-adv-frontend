@@ -97,7 +97,7 @@ export function SignUp() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <div className='flex flex-col items-center justify-center'>
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded shadow-md w-full max-w-lg">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 mt-10 rounded shadow-md w-full max-w-lg">
           <h2 className="text-2xl font-bold mb-6">Cadastro</h2>
 
           <div className="mb-4">
