@@ -1,8 +1,15 @@
 import { api } from "./axios";
 
 export const fetchState = async (): Promise<any> => {
-  const response = await api.get('/state')
-  return response.data
+  try {
+    const response = await api.get('/state')
+
+    return response.data
+  } catch (error) {
+    console.log(error)
+    return "Error"
+  }
+
 
 };
 

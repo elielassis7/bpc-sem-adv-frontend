@@ -1,16 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import * as z from 'zod';
-import { registerUser } from '../../api/sign-up';
-import { Footer } from '../../components/Footer';
+import { z } from 'zod';
 import { Header } from '../../components/Header';
 import { fetchCity, fetchState } from '../../lib/StateAndCity';
 import { formatPhoneNumber } from '../../util/formatPhone';
 
+interface StepFormProps {
+  step: number
+  currentStep: number
+  children: React.ReactNode
+}
 
 const UserSchema = z.object({
   name: z.string().min(1, { message: "Nome é obrigatório" }),
@@ -30,20 +30,18 @@ const UserSchema = z.object({
 
 type RegisterFormData = z.infer<typeof UserSchema>;
 
+
 export function SignUp() {
-  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
-    resolver: zodResolver(UserSchema),
-  })
-  const navigate = useNavigate();
+
+  const [currentStep, setCurrentStep] = useState(1)
+  const { register, watch, setValue, formState: { errors, isSubmitting } } = useForm<RegisterFormData>()
+
+  const [income, setIncome] = useState<boolean>(false);
+  const [report, setReport] = useState<boolean>(false);
+  const [elderly, setElderly] = useState<boolean>(false);
 
 
-  const rendaFamiliar = watch("familyIncome") || 0;
-  const quantidadePessoas = watch("amountOfPeople") || 1;
-  const rendaPerCapita = rendaFamiliar / quantidadePessoas;
-
-  useEffect(() => {
-    setValue("perCapitaIncome", rendaPerCapita);
-  }, [rendaFamiliar, quantidadePessoas, rendaPerCapita, setValue])
+  const isButtonEnabled = income && (report || elderly);
 
   const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhoneNumber = formatPhoneNumber(event.target.value)
@@ -56,6 +54,9 @@ export function SignUp() {
 
   async function fetchEstados() {
     const response = await fetchState()
+    if (response === 'Error') {
+      toast.error('Erro no servidor, não conseguimos buscar os Estados, tente novamente')
+    }
     setEstados(response.sort())
   }
 
@@ -76,142 +77,193 @@ export function SignUp() {
     }
   }, [watch("state")]);
 
-  const mutation = useMutation(registerUser, {
-    onSuccess: (data) => {
-      localStorage.setItem('token', data.token);
-      toast.success('Cadastro realizado com sucesso!');
-      navigate('/dashboard');
-    },
-    onError: (error) => {
-      toast.error('Erro no cadastro. Por favor, tente novamente.');
-      console.error('Erro no cadastro:', error);
-    },
-  });
+  const steps = [
+    { step: 1, label: 'Dados pessoais' },
+    { step: 2, label: 'Termo' },
+    { step: 3, label: 'Pagamento' },
+    { step: 4, label: 'Concluído' }
+  ]
 
-  const onSubmit = (data: RegisterFormData) => {
-    mutation.mutate(data);
+  const getColorClass = (currentStep: number, step: number) => {
+    if (currentStep > step) {
+      return 'bg-sky-500';
+    } else if (currentStep === step) {
+      return 'bg-sky-700';
+    } else {
+      return 'bg-gray-400';
+    }
   };
 
+  const getCursorClass = (currentStep: number, step: number) => {
+    return currentStep < step ? 'cursor-not-allowed' : 'cursor-pointer'
+  }
+
+  const StepForm = ({ step, currentStep, children }: StepFormProps) => (
+    <form className={`bg-white ${currentStep === step ? 'block' : 'hidden'} p-6 mt-10 rounded shadow-md w-full max-w-lg`}>
+      {children}
+    </form>
+  )
+
+
+  const increaseStep = () => setCurrentStep(currentStep + 1);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
-      <div className='flex flex-col items-center justify-center'>
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 mt-10 rounded shadow-md w-full max-w-lg">
-          <h2 className="text-2xl font-bold mb-6">Cadastro</h2>
+      <div className='flex flex-col py-16 items-center'>
 
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700">Nome</label>
-            <input id="name" {...register("name")} className="w-full p-2 border border-gray-300 rounded mt-1" />
-            {errors.name && <span className="text-red-500">{errors.name.message}</span>}
+        <div className='w-full mx-24 flex flex-row items-center justify-evenly'>
+          {steps.map(({ step, label }) => (
+            <div
+              key={step}
+              onClick={() => currentStep >= step && setCurrentStep(step)}
+              className={`relative size-10 flex items-center justify-center ${getColorClass(currentStep, step)} ${getCursorClass(currentStep, step)} text-white text-lg font-bold rounded-full`}
+            >
+              {step}
+              <span className='absolute -translate-y-10 text-black text-center text-base'>{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <StepForm step={1} currentStep={currentStep}>
+          <h2 className="text-2xl font-bold mb-6">Dados pessoais</h2>
+
+          <div className='flex flex-row gap-5'>
+
+            <div className='flex flex-col'>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700">Nome</label>
+                <input id="name" {...register("name")} className="w-full p-2 border border-gray-300 rounded mt-1" />
+                {errors.name && <span className="text-red-500">{errors.name.message}</span>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="phone" className="block text-gray-700">Telefone</label>
+                <input
+                  id="phone"
+                  {...register("phone")}
+                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                  onChange={handlePhoneNumberChange}
+                  maxLength={16} // to handle input length
+                />
+                {errors.phone && <span className="text-red-500">{errors.phone.message}</span>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="state" className="block text-gray-700">Estado</label>
+                <select id="state" {...register("state")} className="w-full p-2 border border-gray-300 rounded mt-1">
+                  <option value="">Selecione um estado</option>
+                  {estados.map((state) => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+                {errors.state && <span className="text-red-500">{errors.state.message}</span>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="city" className="block text-gray-700">Cidade</label>
+                <select id="city" {...register("city")} className="w-full p-2 border border-gray-300 rounded mt-1">
+                  <option value="">Selecione uma cidade</option>
+                  {cidades.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+                {errors.city && <span className="text-red-500">{errors.city.message}</span>}
+              </div>
+            </div>
+
+            <div className='flex flex-col'>
+
+
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-gray-700">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete='username'
+                  {...register("email")}
+                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                />
+                {errors.email && <span className="text-red-500">{errors.email.message}</span>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="password" className="block text-gray-700">Senha</label>
+                <input
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                  autoComplete='new-password'
+                />
+                {errors.password && <span className="text-red-500">{errors.password.message}</span>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="confirmPassword" className="block text-gray-700">Confirme a senha</label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  {...register("confirmPassword")}
+                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                  autoComplete='new-password'
+                />
+                {errors.confirmPassword && <span className="text-red-500">{errors.confirmPassword.message}</span>}
+              </div>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700">Email</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete='username'
-              {...register("email")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
-            />
-            {errors.email && <span className="text-red-500">{errors.email.message}</span>}
+          <button onClick={increaseStep} type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded mt-7">
+            Próximo
+          </button>
+        </StepForm>
+
+        <StepForm step={2} currentStep={currentStep}>
+          <h2 className="text-2xl font-bold mb-6">Termo</h2>
+
+          <div className='flex flex-col gap-3 items-start justify-center'>
+
+            <div className='flex flex-row gap-2'>
+              <input type="checkbox" name="income" id="income" checked={income} onChange={() => setIncome(!income)} />
+              <label htmlFor="income">Estou ciente que apenas pessoas que tem a renda per capita igual ou menor a R$379,50 tem direito ao BPC.</label>
+            </div>
+
+            <div className='flex flex-row gap-2 bg-emerald-200'>
+              <input type="checkbox" name="report" id="report" checked={report} onChange={() => setReport(!report)} />
+              <label htmlFor="report">No caso da pessoa com deficiência, esta condição tem de ser capaz de lhe causar impedimentos de natureza física, mental, intelectual ou sensorial de longo prazo (com efeitos por pelo menos 2 anos), que a impossibilite de participar de forma plena e efetiva na sociedade, em igualdade de condições com as demais pessoas.</label>
+            </div>
+
+            <div className='flex flex-row gap-2'>
+              <input type="checkbox" name="elderly" id="elderly" checked={elderly} onChange={() => setElderly(!elderly)} />
+              <label htmlFor="elderly">No caso do idoso, deve ter idade igual ou superior a 65 anos.</label>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700">Senha</label>
-            <input
-              id="password"
-              type="password"
-              {...register("password")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
-              autoComplete='new-password'
-            />
-            {errors.password && <span className="text-red-500">{errors.password.message}</span>}
-          </div>
+          <button onClick={increaseStep} disabled={!isButtonEnabled} type="submit" className="w-full bg-blue-500 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-black text-white p-2 rounded mt-7">
+            Próximo
+          </button>
+        </StepForm>
 
-          <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-gray-700">Confirme a senha</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              {...register("confirmPassword")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
-              autoComplete='new-password'
-            />
-            {errors.confirmPassword && <span className="text-red-500">{errors.confirmPassword.message}</span>}
-          </div>
+        <StepForm step={3} currentStep={currentStep}>
+          <h2 className="text-2xl font-bold mb-6">Pagamento</h2>
+          {/* Seus campos de formulário aqui */}
+          <button onClick={increaseStep} type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded mt-7">
+            Próximo
+          </button>
+        </StepForm>
 
-          <div className="mb-4">
-            <label htmlFor="phone" className="block text-gray-700">Telefone</label>
-            <input
-              id="phone"
-              {...register("phone")}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
-              onChange={handlePhoneNumberChange}
-              maxLength={16} // to handle input length
-            />
-            {errors.phone && <span className="text-red-500">{errors.phone.message}</span>}
-          </div>
+        <StepForm step={4} currentStep={currentStep}>
+          <h2 className="text-2xl font-bold mb-6">Concluído</h2>
+          <p>Parabéns seu acesso foi liberado</p>
+          <button type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded mt-7">
+            Finalizar
+          </button>
+        </StepForm>
 
-          <div className="mb-4">
-            <label htmlFor="state" className="block text-gray-700">Estado</label>
-            <select id="state" {...register("state")} className="w-full p-2 border border-gray-300 rounded mt-1">
-              <option value="">Selecione um estado</option>
-              {estados.map((state) => (
-                <option key={state} value={state}>{state}</option>
-              ))}
-            </select>
-            {errors.state && <span className="text-red-500">{errors.state.message}</span>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="city" className="block text-gray-700">Cidade</label>
-            <select id="city" {...register("city")} className="w-full p-2 border border-gray-300 rounded mt-1">
-              <option value="">Selecione uma cidade</option>
-              {cidades.map((city) => (
-                <option key={city} value={city}>{city}</option>
-              ))}
-            </select>
-            {errors.city && <span className="text-red-500">{errors.city.message}</span>}
-          </div>
-
-          <div className="mb-4 relative">
-            <label htmlFor="familyIncome" className="block text-gray-700">Renda Familiar</label>
-            <span className="absolute left-3 top-10 text-gray-900">R$</span>
-            <input
-              id="familyIncome"
-              type="number"
-              {...register("familyIncome", { valueAsNumber: true })}
-              className="w-full pl-10 p-2 border border-gray-300 rounded mt-1"
-
-            />
-            {errors.familyIncome && <span className="text-red-500">{errors.familyIncome.message}</span>}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="amountOfPeople" className="block text-gray-700">Quantidade de Pessoas</label>
-            <input id="amountOfPeople" type="number" {...register("amountOfPeople", { valueAsNumber: true })} className="w-full p-2 border border-gray-300 rounded mt-1" />
-            {errors.amountOfPeople && <span className="text-red-500">{errors.amountOfPeople.message}</span>}
-          </div>
-
-          <div className="mb-4 ">
-            <label>Renda Per Capita: R$</label>
-            <input
-              type="number"
-              readOnly
-              {...register("perCapitaIncome", { valueAsNumber: true })}
-              value={rendaPerCapita.toFixed(2)}
-              className='outline-none'
-            />
-          </div>
-
-          <button type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded">Cadastrar</button>
-        </form>
       </div>
-      <Footer />
     </div>
   );
+
 }
 
 
