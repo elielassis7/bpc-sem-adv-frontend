@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { ProtectedRoute } from "./middleware/ProtectedRoute";
 import { SignIn } from "./pages/Auth/SingIn";
-import { SignUp } from "./pages/Auth/SingUp";
+import { SignUp } from "./pages/Auth/SingUp/Index";
 import { Dashboard } from "./pages/Dashboard";
 import { Error } from "./pages/Error";
 import { Home } from "./pages/Home";

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Header } from '../../components/Header';
-import { fetchCity, fetchState } from '../../lib/StateAndCity';
-import { formatPhoneNumber } from '../../util/formatPhone';
+import { Header } from '../../../components/Header';
+import { fetchCity, fetchState } from '../../../lib/StateAndCity';
+import { formatPhoneNumber } from '../../../util/formatPhone';
 
 interface StepFormProps {
   step: number
@@ -20,9 +20,6 @@ const UserSchema = z.object({
   phone: z.string().min(14, { message: "Telefone inválido" }),
   city: z.string().min(1, { message: "Cidade é obrigatória" }),
   state: z.string().min(1, { message: "Estado é obrigatório" }),
-  familyIncome: z.number().min(1, { message: "Renda familiar é obrigatória" }),
-  amountOfPeople: z.number().min(1, { message: "Quantidade de pessoas é obrigatória" }),
-  perCapitaIncome: z.number(),
 }).refine(data => data.password === data.confirmPassword, {
   message: 'As senhas não correspondem',
   path: ['confirmPassword'],
