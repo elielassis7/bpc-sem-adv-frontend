@@ -4,7 +4,7 @@ import { InformativeContent } from "./components/informativeContent";
 
 export function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-blue-200">
+    <div className="min-h-screen flex flex-col pt-20 bg-blue-200">
       <Header />
       <main className="flex-grow p-4 ">
         <div className="my-10 mx-52 flex-1 h-96 border-yellow-400 border-2">
