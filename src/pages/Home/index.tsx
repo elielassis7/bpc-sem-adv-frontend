@@ -1,7 +1,8 @@
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { DeductionCalculator } from "./components/DeductionCalculator";
-import { InformativeContent } from "./components/informativeContent";
+import { InformativeContent } from "./components/InformativeContent";
+
 
 
 export function Home() {
@@ -29,6 +30,15 @@ export function Home() {
 
         <InformativeContent />
         <DeductionCalculator />
+
+        <div className="w-full flex flex-col items-center justify-start mb-5">
+          <h2 className="font-bold text-3xl text-black">
+            Vou ser mesmo capaz de fazer o processo mesmo não sendo um advogado?
+          </h2>
+          <p className="text-xl text-gray-700">
+            Claro que sim, o processo realmente tem suas burocracias como tudo que temos hoje no Brasil infelizmente. No curso vamos simplificar para você conseguir fazer todo passo a passo, tanto que não há nenhuma menção sobre advogados em todo o processo do BPC, ou seja, qualquer pessoa que tenha o conhecimento pode fazer.
+          </p>
+        </div>
 
 
         <p className="mx-20">
