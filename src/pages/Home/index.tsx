@@ -1,6 +1,8 @@
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
+import { DeductionCalculator } from "./components/DeductionCalculator";
 import { InformativeContent } from "./components/informativeContent";
+
 
 export function Home() {
   return (
@@ -26,7 +28,7 @@ export function Home() {
         </div>
 
         <InformativeContent />
-
+        <DeductionCalculator />
 
 
         <p className="mx-20">
