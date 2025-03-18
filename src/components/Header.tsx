@@ -8,7 +8,7 @@ export function Header() {
 
 
   return (
-    <header className="bg-emerald-600 px-4 h-20 w-full flex justify-between items-center shadow-lg fixed top-0 overflow-hidden">
+    <header className="bg-emerald-600 px-4 h-20 w-full flex justify-between items-center shadow-lg top-0 mb-10">
       <div className="flex items-center">
         <Link to={"/"} tabIndex={1} className="text-white text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">Pagina Principal</Link>
       </div>

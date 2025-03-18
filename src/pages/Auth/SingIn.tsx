@@ -49,7 +49,7 @@ export function SignIn() {
   return (
     <div className="h-screen flex flex-col bg-gray-100">
       <Header />
-      <div className='flex flex-col items-center justify-center my-auto mt-10'>
+      <div className='flex flex-col items-center justify-center my-auto'>
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
           <h2 className="text-2xl font-bold mb-6">Login</h2>
           <div className="mb-4">
