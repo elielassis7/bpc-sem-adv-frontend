@@ -1,7 +1,7 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { getUserIdFromToken } from '../../api/get-user-id-from-token';
 import { Footer } from '../../components/Footer';
 import { HeaderDashboard } from '../../components/HeaderDashboard';
 import { useStep } from '../../hooks/useStep';
@@ -10,6 +10,8 @@ import { AxiosInterceptor } from '../../middleware/AxiosInterceptor';
 import { Loading } from '../Loading';
 import { NotFound } from '../NotFound';
 import { ListClass } from './components/ListClass';
+import { NavigationButtons } from './components/NavigationButtons';
+import { Player } from './components/Player';
 
 
 interface CustomError {
@@ -52,6 +54,14 @@ export function Step() {
   const currentOrder = Number(data?.order)
 
   const listProps = { currentOrder }
+  const token = localStorage.getItem('token'); // Recupera o token
+  let userId = "id"
+  if (token) {
+    userId = String(getUserIdFromToken(token))
+    console.log('User ID:', userId);
+  }
+
+
 
 
 
@@ -81,56 +91,23 @@ export function Step() {
           <div className='col-span-1' />
 
           <div className='col-span-8 flex flex-col mt-4'>
-            <video
-              src={data?.pathVideo}
-              controls
-              className='w-full h-[400px] border-4 bg-black border-yellow-400 rounded-sm focus:outline-none focus:border-2 focus:border-yellow-400'
-              tabIndex={10}
+            <Player videoUrl={data.pathVideo} stepId={data.id} userId={userId} />
+
+            <h1 tabIndex={11} className='text-3xl text-gray-900 font-bold mb-4 focus:outline-none focus:border-2 focus:border-yellow-400'>
+              {data?.title}
+            </h1>
+            <p tabIndex={12} className='text-xl text-gray-800 font-medium focus:outline-none focus:border-2 focus:border-yellow-400'>
+              {data?.content}
+            </p>
+
+
+            <NavigationButtons
+              orderPrevious={orderPrevious}
+              orderNext={orderNext}
+              maxOrder={maxOrder}
+              navigate={navigate}
+
             />
-
-            <h1 tabIndex={11} className='text-3xl text-gray-900 font-bold mb-4 focus:outline-none focus:border-2 focus:border-yellow-400'>{data?.title}</h1>
-            <p tabIndex={12} className='text-xl text-gray-800 font-medium focus:outline-none focus:border-2 focus:border-yellow-400'>{data?.content}</p>
-
-
-            <div className='flex flex-row items-center justify-center mt-10 mb-5 gap-6'>
-              {orderPrevious === 0 ?
-                <button
-                  type='button'
-                  className='flex items-center bg-gray-500 px-4 py-2 gap-1 rounded cursor-not-allowed text-white'
-                >
-                  <ChevronLeft />
-                  Anterior
-                </button> :
-                <button
-                  type='button'
-                  tabIndex={13}
-                  onClick={() => navigate(`/step/${orderPrevious}`)}
-                  className='flex items-center group  px-4 py-2 gap-1 rounded cursor-pointer text-white active:scale-95 bg-green-600 hover:bg-green-500 focus:outline-none focus:border-2 focus:border-yellow-400'
-                >
-                  <ChevronLeft className='group-hover:-translate-x-2 duration-300' />
-                  Anterior
-                </button>
-              }
-
-              {orderNext > maxOrder ?
-                <button
-                  type='button'
-                  className='flex items-center bg-gray-500 px-4 py-2 gap-1 rounded cursor-not-allowed text-white'
-                >
-                  Proximo
-                  <ChevronRight />
-                </button> :
-                <button
-                  type='button'
-                  tabIndex={14}
-                  onClick={() => navigate(`/step/${orderNext}`)}
-                  className='flex items-center group px-4 py-2 gap-1 rounded cursor-pointer text-white active:scale-95 bg-green-600 hover:bg-green-500 focus:outline-none focus:border-2 focus:border-yellow-400'
-                >
-                  Proximo
-                  <ChevronRight className='group-hover:translate-x-2 duration-300' />
-                </button>
-              }
-            </div>
 
           </div>
 

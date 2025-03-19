@@ -33,12 +33,6 @@ export function SignUp() {
   const [currentStep, setCurrentStep] = useState(1)
   const { register, watch, setValue, formState: { errors, isSubmitting } } = useForm<RegisterFormData>()
 
-  const [income, setIncome] = useState<boolean>(false);
-  const [report, setReport] = useState<boolean>(false);
-  const [elderly, setElderly] = useState<boolean>(false);
-
-
-  const isButtonEnabled = income && (report || elderly);
 
   const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhoneNumber = formatPhoneNumber(event.target.value)
@@ -76,9 +70,8 @@ export function SignUp() {
 
   const steps = [
     { step: 1, label: 'Dados pessoais' },
-    { step: 2, label: 'Termo' },
-    { step: 3, label: 'Pagamento' },
-    { step: 4, label: 'Concluído' }
+    { step: 2, label: 'Pagamento' },
+    { step: 3, label: 'Concluído' }
   ]
 
   const getColorClass = (currentStep: number, step: number) => {
@@ -216,32 +209,6 @@ export function SignUp() {
         </StepForm>
 
         <StepForm step={2} currentStep={currentStep}>
-          <h2 className="text-2xl font-bold mb-6">Termo</h2>
-
-          <div className='flex flex-col gap-3 items-start justify-center'>
-
-            <div className='flex flex-row gap-2'>
-              <input type="checkbox" name="income" id="income" checked={income} onChange={() => setIncome(!income)} />
-              <label htmlFor="income">Estou ciente que apenas pessoas que tem a renda per capita igual ou menor a R$379,50 tem direito ao BPC.</label>
-            </div>
-
-            <div className='flex flex-row gap-2 bg-emerald-200'>
-              <input type="checkbox" name="report" id="report" checked={report} onChange={() => setReport(!report)} />
-              <label htmlFor="report">No caso da pessoa com deficiência, esta condição tem de ser capaz de lhe causar impedimentos de natureza física, mental, intelectual ou sensorial de longo prazo (com efeitos por pelo menos 2 anos), que a impossibilite de participar de forma plena e efetiva na sociedade, em igualdade de condições com as demais pessoas.</label>
-            </div>
-
-            <div className='flex flex-row gap-2'>
-              <input type="checkbox" name="elderly" id="elderly" checked={elderly} onChange={() => setElderly(!elderly)} />
-              <label htmlFor="elderly">No caso do idoso, deve ter idade igual ou superior a 65 anos.</label>
-            </div>
-          </div>
-
-          <button onClick={increaseStep} disabled={!isButtonEnabled} type="submit" className="w-full bg-blue-500 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-black text-white p-2 rounded mt-7">
-            Próximo
-          </button>
-        </StepForm>
-
-        <StepForm step={3} currentStep={currentStep}>
           <h2 className="text-2xl font-bold mb-6">Pagamento</h2>
           {/* Seus campos de formulário aqui */}
           <button onClick={increaseStep} type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded mt-7">
@@ -249,9 +216,10 @@ export function SignUp() {
           </button>
         </StepForm>
 
-        <StepForm step={4} currentStep={currentStep}>
+        <StepForm step={3} currentStep={currentStep}>
           <h2 className="text-2xl font-bold mb-6">Concluído</h2>
           <p>Parabéns seu acesso foi liberado</p>
+          <p>Vamos enviar para o seu email e WhatsApp o acesso ao curso</p>
           <button type="submit" disabled={isSubmitting} className="w-full bg-blue-500 text-white p-2 rounded mt-7">
             Finalizar
           </button>
